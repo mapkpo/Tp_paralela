@@ -1,12 +1,27 @@
-MEJOR RESULTADO DE 5 RUNS STOCK CPU SERIE
+MEJOR RESULTADO DE 5 RUNS STOCK CPU SERIE NVCC
 
-./a.out images/rome.bmp 
 Image opened (width=3300 height=2468).
 Step #1 Completed - Result stored in "images/hw3_result_1.bmp".
-Elapsed CPU: 33.453000ms / [GPU version not available]
+Elapsed CPU: 31.764000ms / [GPU version not available]
 Step #2 Completed - Result stored in "images/hw3_result_2.bmp".
-Elapsed CPU: 217.224000ms / [GPU version not available]
+Elapsed CPU: 213.190000ms / [GPU version not available]
 Step #3 Completed - Result stored in "images/hw3_result_3.bmp".
-Elapsed CPU: 400.905000ms / [GPU version not available]
+Elapsed CPU: 391.313000ms / [GPU version not available]
+
+real	0m1,371s
+user	0m1,022s
+sys	0m0,243s
 
 -------------------------------------------------------------------------
+
+MEJOR RESULTADO DE 5 RUNS CPU OPENMP GCC
+Image opened (width=3300 height=2468).
+Step #1 Completed - Result stored in "images/hw3_result_1.bmp".Elapsed CPU: 12.240000ms / 
+Step #2 Completed - Result stored in "images/hw3_result_2.bmp".Elapsed CPU: 38.182000ms / 
+Step #3 Completed - Result stored in "images/hw3_result_3.bmp".Elapsed CPU: 54.688000ms / 
+
+real	0m0,743s
+user	0m1,635s
+sys	0m0,179s
+
+

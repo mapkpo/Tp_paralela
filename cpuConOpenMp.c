@@ -212,7 +212,7 @@ void cpu_sobel(int width, int height, float *image, float *image_out)
     {
         int offset_t = h * width;
         int offset   = (h + 1) * width;
-    
+        
         for (int w = 0; w < (width - 2); w++)
         {
             float gx = cpu_applyFilter(&image[offset_t + w], width, sobel_x, 3);
@@ -250,8 +250,7 @@ int main(int argc, char **argv)
     printf("Image opened (width=%d height=%d).\n", bitmap.width, bitmap.height);
     
     // Allocate the intermediate image buffers for each step
-
-    #pragma omp parallel for
+    
     for (int i = 0; i < 2; i++)
     {
         image_out[i] = (float *)calloc(image_size, sizeof(float));
@@ -283,7 +282,7 @@ int main(int argc, char **argv)
         store_result(2, elapsed[0], bitmap.width, bitmap.height, image_out[1]);
     }
     
-    // Step 3: Apply a Sobel filter
+    // Step 3: Apply a Sobel filter BAJO DE 400MS A 55MS
     {
         // Launch the CPU version
         gettimeofday(&t[0], NULL);

@@ -9,7 +9,7 @@ Implementar los 3 pasos (grayscale, gauss filter y sobel filter)
 Deben realizarse 4 implementaciones:
 
 - [x] CPU serie 
-- [ ] CPU con openMP
+- [x] CPU con openMP
 - [ ] CUDA con global memory
 - [ ] CUDA con shared memory
  

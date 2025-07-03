@@ -24,3 +24,7 @@ MPI.
 # --------------------------------------------------------------------------------------------------
 
 descargar imagenes de https://github.com/steven-chien/DD2360-HT19/tree/master/Assignment_3/ex_1/images
+
+la imagen que usaremos de prueba será un panorama propio bastante grande para poder sacarle 
+el jugo al procesamiento paralelo: https://drive.google.com/file/d/1yRuvlly71oMsmeUvxzhWGPbMVOz7R2Ba/view?usp=sharing
+

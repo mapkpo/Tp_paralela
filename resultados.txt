@@ -24,4 +24,16 @@ real	0m0,743s
 user	0m1,635s
 sys	0m0,179s
 
+------------------------------------------------------------------------
+
+MEJOR RESUTLADO DE 5 RUNS GPU CUDA CON GLOBAL MEMORY
+Image opened (width=3300 height=2468).
+Step #1 Completed - Result stored in "images/hw3_result_1.bmp".
+Elapsed CPU: 31.653000ms / Elapsed GPU: 2.927000ms
+Step #2 Completed - Result stored in "images/hw3_result_2.bmp".
+Elapsed CPU: 212.440000ms / Elapsed GPU: 2.798000ms
+Step #3 Completed - Result stored in "images/hw3_result_3.bmp".
+Elapsed CPU: 390.632000ms / Elapsed GPU: 2.791000ms
+
+
 

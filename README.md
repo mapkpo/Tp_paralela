@@ -10,7 +10,7 @@ Deben realizarse 4 implementaciones:
 
 - [x] CPU serie 
 - [x] CPU con openMP
-- [ ] CUDA con global memory
+- [x] CUDA con global memory
 - [ ] CUDA con shared memory
  
 Analizar y documentar las diferencias de performance entre las 4 implementaciones

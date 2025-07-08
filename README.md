@@ -1,25 +1,19 @@
-# Tp final de programación paralela 2025
-
-
 ## Consigna
-Edge-detecting 
-Partiendo del código de ejemplo en: https://github.com/steven-chien/DD2360-HT19.git
-Implementar los 3 pasos (grayscale, gauss filter y sobel filter)
- 
-Deben realizarse 4 implementaciones:
-* CPU serie
-* CPU con openMP
-* CUDA con global memory
-* CUDA con shared memory
- 
-Analizar y documentar las diferencias de performance entre las 4 implementaciones
- 
-MPI.
+
 Paralelizar con MPI el código de mergesort.c https://w3.cs.jmu.edu/lam2mo/cs470_2017_01/files/mergesort.c  
 1. randomize() Se ejecuta en el nodo 0 y se reparten los datos equitativamente entre el total de nodos.
 2. Cada nodo calcula el histograma de sus datos.
 3. Cada nodo ordena sus datos y luego se juntan y ordenan con merge().
 
-# --------------------------------------------------------------------------------------------------
+Para compilar y ejecutar el codigo ingresar los siguientes comandos:
+```
+    mpicc -o mergeSortConMPI mergeSortConMPI.c
+    mpirun -np 4 ./mergeSortConMPI 10000
+```
+- 4: cantidad de procesos paralelos MPI.
 
-descargar imagenes de https://github.com/steven-chien/DD2360-HT19/tree/master/Assignment_3/ex_1/images
+- 10000: cantidad total de números enteros aleatorios que el programa generará en el proceso maestro y distribuirá entre los procesos.
+
+Cada proceso recibirá: 10000 / 4 = 2500 números.
+
+Se pueden modificar los valores, solo estan como referencia. 

@@ -6,6 +6,6 @@ cpu_grayscale, cpu_gaussian, cpu_sobel
 
 para compilar usamos:
 ``
-gcc -fopenmp -o3 cpuConOpenMp.c -o cpuConOpenMp -lm
+gcc -fopenmp -O3 cpuConOpenMp.c -o cpuConOpenMp -lm
 ``
 

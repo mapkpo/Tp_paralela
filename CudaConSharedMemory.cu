@@ -3,7 +3,7 @@
 #include <string.h>
 #include <sys/time.h>
 
-#define BLOCK_SIZE  32
+#define BLOCK_SIZE  16
 #define HEADER_SIZE 138
 #define BLOCK_SIZE_SH (BLOCK_SIZE + 2)
 
@@ -137,16 +137,11 @@ void store_result(int index, double elapsed_cpu, double elapsed_gpu,
     writeBMPGrayscale(width, height, image, path);
     
     printf("Step #%d Completed - Result stored in \"%s\".\n", index, path);
-    printf("Elapsed CPU: %fms / ", elapsed_cpu);
+    printf("Elapsed Copy out of device only: %fms / ", elapsed_cpu);
+    printf("Elapsed gpu kernel only: %fms\n", elapsed_gpu);
+    printf("Elapsed total time: %fms\n", elapsed_gpu+elapsed_cpu);
+    printf("------------------------------------------\n");
     
-    if (elapsed_gpu == 0)
-    {
-        printf("[GPU version not available]\n");
-    }
-    else
-    {
-        printf("Elapsed GPU: %fms\n", elapsed_gpu);
-    }
 }
 
 /**
@@ -507,7 +502,7 @@ int main(int argc, char **argv)
     cudaMemcpy(d_bitmap, bitmap.data,
                image_size * sizeof(float) * 3, cudaMemcpyHostToDevice);
     
-    // Step 1: Convert to grayscale
+        // Step 1: Convert to grayscale
     {
         // Launch the CPU version
         gettimeofday(&t[0], NULL);
@@ -516,14 +511,42 @@ int main(int argc, char **argv)
         
         elapsed[0] = get_elapsed(t[0], t[1]);
         
-        // Launch the GPU version
-        gettimeofday(&t[0], NULL);
-        gpu_grayscale<<<grid, block>>>(bitmap.width, bitmap.height, d_bitmap, d_image_out[0]); //hago el kernel launch de la funcion
-        
-        cudaMemcpy(image_out[0], d_image_out[0], image_size * sizeof(float), cudaMemcpyDeviceToHost); 
-        gettimeofday(&t[1], NULL);
-        
-        elapsed[1] = get_elapsed(t[0], t[1]);
+        // Launch the GPU version (kernel-only timing with cudaEvent)
+        float ms_kernel = 0.0f;
+        float ms_kernel_copy = 0.0f;
+        cudaEvent_t start, stop, start_copy, stop_copy;
+        cudaEventCreate(&start);
+        cudaEventCreate(&stop);
+
+        cudaEventCreate(&start_copy);
+        cudaEventCreate(&stop_copy);
+
+        cudaEventRecord(start, 0);
+        gpu_grayscale<<<grid, block>>>(bitmap.width, bitmap.height, d_bitmap, d_image_out[0]);
+        cudaEventRecord(stop, 0);
+        cudaEventSynchronize(stop);
+        cudaEventElapsedTime(&ms_kernel, start, stop);
+
+        // (opcional) revisar errores de kernel
+        checkCUDAError();
+
+        cudaEventDestroy(start);
+        cudaEventDestroy(stop);
+
+        // Copia D2H fuera de la medición del kernel
+        cudaEventRecord(start_copy, 0);
+        cudaMemcpy(image_out[0], d_image_out[0], image_size * sizeof(float), cudaMemcpyDeviceToHost);
+        cudaEventRecord(stop_copy, 0);
+        cudaEventSynchronize(stop_copy);
+        cudaEventElapsedTime(&ms_kernel_copy, start_copy, stop_copy);
+
+        cudaEventDestroy(start_copy);
+        cudaEventDestroy(stop_copy);
+
+        // Guardamos el tiempo GPU solo del kernel
+        elapsed[1] = ms_kernel;
+        elapsed[0] = ms_kernel_copy;
+
         
         // Store the result image in grayscale
         store_result(1, elapsed[0], elapsed[1], bitmap.width, bitmap.height, image_out[0]);
@@ -539,13 +562,39 @@ int main(int argc, char **argv)
         elapsed[0] = get_elapsed(t[0], t[1]);
         
         // Launch the GPU version
-        gettimeofday(&t[0], NULL);
+        float ms_kernel = 0.0f;
+        float ms_kernel_copy = 0.0f;
+        cudaEvent_t start, stop, start_copy, stop_copy;
+        cudaEventCreate(&start);
+        cudaEventCreate(&stop);
+
+        cudaEventCreate(&start_copy);
+        cudaEventCreate(&stop_copy);
+
+        cudaEventRecord(start, 0);
         gpu_gaussian<<<grid, block>>>(bitmap.width, bitmap.height, d_image_out[0], d_image_out[1]);
-        
-        cudaMemcpy(image_out[1], d_image_out[1], image_size * sizeof(float), cudaMemcpyDeviceToHost);
-        gettimeofday(&t[1], NULL);
-        
-        elapsed[1] = get_elapsed(t[0], t[1]);
+        cudaEventRecord(stop, 0);
+        cudaEventSynchronize(stop);
+        cudaEventElapsedTime(&ms_kernel, start, stop);
+        checkCUDAError();
+
+        cudaEventDestroy(start);
+        cudaEventDestroy(stop);
+
+        // Copia D2H fuera de la medición del kernel
+        cudaEventRecord(start_copy, 0);
+        cudaMemcpy(image_out[0], d_image_out[0], image_size * sizeof(float), cudaMemcpyDeviceToHost);
+        cudaEventRecord(stop_copy, 0);
+        cudaEventSynchronize(stop_copy);
+        cudaEventElapsedTime(&ms_kernel_copy, start_copy, stop_copy);
+
+        cudaEventDestroy(start_copy);
+        cudaEventDestroy(stop_copy);
+
+        // Guardamos el tiempo GPU solo del kernel
+        elapsed[1] = ms_kernel;
+        elapsed[0] = ms_kernel_copy;
+
         
         // Store the result image with the Gaussian filter applied
         store_result(2, elapsed[0], elapsed[1], bitmap.width, bitmap.height, image_out[1]);
@@ -561,13 +610,38 @@ int main(int argc, char **argv)
         elapsed[0] = get_elapsed(t[0], t[1]);
         
         // Launch the GPU version
-        gettimeofday(&t[0], NULL);
+        float ms_kernel = 0.0f;
+        float ms_kernel_copy = 0.0f;
+        cudaEvent_t start, stop, start_copy, stop_copy;
+        cudaEventCreate(&start);
+        cudaEventCreate(&stop);
+
+        cudaEventCreate(&start_copy);
+        cudaEventCreate(&stop_copy);
+
+        cudaEventRecord(start, 0);
         gpu_sobel<<<grid, block>>>(bitmap.width, bitmap.height, d_image_out[1], d_image_out[0]);
-        
+        cudaEventRecord(stop, 0);
+        cudaEventSynchronize(stop);
+        cudaEventElapsedTime(&ms_kernel, start, stop);
+        checkCUDAError();
+
+        cudaEventDestroy(start);
+        cudaEventDestroy(stop);
+
+        // Copia D2H fuera de la medición del kernel
+        cudaEventRecord(start_copy, 0);
         cudaMemcpy(image_out[0], d_image_out[0], image_size * sizeof(float), cudaMemcpyDeviceToHost);
-        gettimeofday(&t[1], NULL);
-        
-        elapsed[1] = get_elapsed(t[0], t[1]);
+        cudaEventRecord(stop_copy, 0);
+        cudaEventSynchronize(stop_copy);
+        cudaEventElapsedTime(&ms_kernel_copy, start_copy, stop_copy);
+
+        cudaEventDestroy(start_copy);
+        cudaEventDestroy(stop_copy);
+
+        // Guardamos el tiempo GPU solo del kernel
+        elapsed[1] = ms_kernel;
+        elapsed[0] = ms_kernel_copy;
         
         // Store the final result image with the Sobel filter applied
         store_result(3, elapsed[0], elapsed[1], bitmap.width, bitmap.height, image_out[0]);
